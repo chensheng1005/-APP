@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>知乎日报</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="css/mui.min.css">
+
+		<style>
+			.title {
+				margin: 10px 15px 15px;
+				color: #6d6d72;
+				font-size: 15px;
+			}
+		</style>
+		<!--App自定义的css-->
+		<!--<link rel="stylesheet" type="text/css" href="css/app.css"/>-->
+	</head>
+
+	<body>
+		<div id="offCanvasWrapper" class="mui-off-canvas-wrap mui-draggable">
+			<!--侧滑菜单部分-->
+			<aside id="offCanvasSide" class="mui-off-canvas-left">
+				<div id="offCanvasSideScroll" class="mui-scroll-wrapper">
+					<div class="mui-scroll">
+						
+					</div>
+				</div>
+			</aside>
+			<!--主界面部分-->
+			<div class="mui-inner-wrap">
+				<header class="mui-bar mui-bar-nav">
+					<a href="#offCanvasSide" class="mui-icon mui-action-menu mui-icon-bars mui-pull-left"></a>
+					<h1 class="mui-title">首页</h1>
+				</header>
+				<div id="offCanvasContentScroll" class="mui-content mui-scroll-wrapper">
+					<div class="mui-scroll">
+						<div class="mui-content-padded">
+							<div id="slider" class="mui-slider">
+								<div id="zhimges" class="mui-slider-group mui-slider-loop">
+									<!-- 额外增加的一个节点(循环轮播：第一个节点是最后一张轮播) -->
+									
+								</div>
+								<div id="btndian" class="mui-slider-indicator mui-text-right">
+									<div class="mui-indicator mui-active"></div>
+								</div>
+							</div>
+						</div>
+						<p class="title">今日热闻</p>
+						<div id="listphoto">
+							
+						</div>
+					</div>
+				</div>
+				<!-- off-canvas backdrop -->
+				<div class="mui-off-canvas-backdrop"></div>
+			</div>
+		</div>
+	</body>
+	<script src="js/mui.min.js"></script>
+
+	<script>
+		mui.init({
+			swipeBack: true //启用右滑关闭功能
+		});
+
+
+		mui.ajax({
+			type: "get", //jquey是不支持post方式跨域的
+			url: "https://news-at.zhihu.com/api/4/news/latest", //跨域请求的URL
+			//传递给请求处理程序，用以获得jsonp回调函数名的参数名(默认为:callback)
+			success: function(data) {
+				var html = "<div class='mui-slider-item mui-slider-item-duplicate'>"
+				html += "<a href='" + data.top_stories[data.top_stories.length - 1].id + "'>";
+				html += "<img src='" + data.top_stories[data.top_stories.length - 1].image + "'>";
+				html += "<p class='mui-slider-title'>" + data.top_stories[data.top_stories.length - 1].title + "</p>";
+				html += "</a>";
+				html += "</div>";
+
+				var btndian = "";
+
+				for (var i = 0; i < data.top_stories.length; i++) {
+					html += "<div class='mui-slider-item'>";
+					html += "<a href='" + data.top_stories[i].id + "'>";
+					html += "<img src='" + data.top_stories[i].image + "'>";
+					html += "<p class='mui-slider-title'>" + data.top_stories[i].title + "</p>";
+					html += "</a>";
+					html += "</div>";
+
+					btndian += "<div class='mui-indicator'></div>";
+				}
+
+				html += "<div class='mui-slider-item mui-slider-item-duplicate'>"
+				html += "<a href='" + data.top_stories[0].id + "'>";
+				html += "<img src='" + data.top_stories[0].image + "'>";
+				html += "<p class='mui-slider-title'>" + data.top_stories[0].title + "</p>";
+				html += "</a>";
+				html += "</div>";
+				document.getElementById("zhimges").innerHTML = html;
+				document.getElementById("btndian").innerHTML = btndian;
+
+				var html1 = "";
+				for (var i = 0; i < data.stories.length; i++) {
+					html1 += "<div class='mui-card' style='margin-bottom: 5px;'>";
+					html1 += "<ul class='mui-table-view'>";
+					html1 += "<li class='mui-table-view-cell mui-media'>";
+					html1 += "<a href='" + data.stories[i].id + "'>";
+					html1 += "<img class='mui-media-object mui-pull-right' src='" + data.stories[i].images + "'>";
+					html1 += "<div class='mui-media-body'>";
+					html1 += "<p class='mui-ellipsis'>" + data.stories[i].title + "</p>";
+					html1 += "</div></a></li></ul></div>";
+				}
+				document.getElementById("listphoto").innerHTML = html1;
+
+				var slider = mui("#slider");
+				slider.slider({
+					interval: 2000
+				});
+			},
+			error: function(e) {
+				//失败后回调      
+				alert("服务器请求失败");
+			}
+		});
+	</script>
+
+	<script>
+		mui('#zhimges').on('tap','.mui-slider-item',function(){
+			var a = this.getElementsByTagName('a')[0];
+			var ggg = a.getAttribute('href');
+			mui.openWindow({
+				url:"Know.html",
+				id:"detail",
+				extras:{
+					kid:ggg
+				}
+			})
+		})
+		
+		mui('#listphoto').on('tap','.mui-card',function(){
+			var a = this.getElementsByTagName('a')[0];
+			var ggg = a.getAttribute('href');
+			mui.openWindow({
+				url:"Know.html",
+				id:"detail",
+				extras:{
+					kid:ggg
+				}
+			})
+		})
+	</script>
+	<script>
+		mui.init();
+		//侧滑容器父节点
+		var offCanvasWrapper = mui('#offCanvasWrapper');
+		//主界面容器
+		var offCanvasInner = offCanvasWrapper[0].querySelector('.mui-inner-wrap');
+		//菜单容器
+		var offCanvasSide = document.getElementById("offCanvasSide");
+		//移动效果是否为整体移动
+		var moveTogether = false;
+		//侧滑容器的class列表，增加.mui-slide-in即可实现菜单移动、主界面不动的效果；
+		var classList = offCanvasWrapper[0].classList;
+		classList.add('mui-slide-in');
+
+		//主界面和侧滑菜单界面均支持区域滚动；
+		mui('#offCanvasSideScroll').scroll();
+		mui('#offCanvasContentScroll').scroll();
+	</script>
+</html>
