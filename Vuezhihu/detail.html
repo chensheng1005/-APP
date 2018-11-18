@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<meta http-equiv="Access-Control-Allow-Origin" content="*">
+
+		<meta http-equiv="content-security-policy">
+		<title></title>
+		<script src="js/mui.min.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/icons-extra.css" rel="stylesheet" />
+		<script type="text/javascript" charset="utf-8">
+			mui.init();
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title"><span id="title"></span></h1>
+		</header>
+
+		<div class="mui-content">
+			<div class="mui-slider">
+				<div class="mui-slider-group">
+					<div class="mui-slider-item">
+						<a href="#">
+							<img id="img_src" src="" />
+							<p id="img-title" style="font-size: 30px;position: absolute;bottom: 30px;color: #DDDDDD;">
+
+							</p>
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<div id="page-content" class="mui-content">
+
+			</div>
+
+		</div>
+
+		<script type="text/javascript">
+			var id = window.location.search.substring(4);
+
+			fetch("http://news-at.zhihu.com/api/2/news/" + id, {
+				methods: "get"
+			}).then(function(res) {
+				res.json().then(function(data) {
+					console.log(data);
+					document.getElementById("title").innerHTML = data.title;
+					document.getElementById("img_src").src = data.image;
+					document.getElementById("img-title").innerHTML=data.image_source;
+					document.getElementById("page-content").innerHTML = data.body;
+				})
+			});
+			
+			//将所有这个内容里的所有a标签跳转地址功能关闭
+			mui("#page-content").on("tap","a",function(){
+				return false;
+			})
+			
+		</script>
+	</body>
+</html>
